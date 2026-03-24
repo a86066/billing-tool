@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>請款明細產生器</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel form-panel">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Billing Tool v1</p>
+            <h1>請款明細產生器</h1>
+          </div>
+          <p class="section-note">手機版優先、純前端、即時更新</p>
+        </header>
+
+        <form id="billing-form" class="form-layout">
+          <section class="block">
+            <h2>基本資料</h2>
+            <div class="grid single-grid">
+              <label class="field">
+                <span>名稱</span>
+                <input type="text" id="clientName" placeholder="例如：某某有限公司" />
+              </label>
+
+              <label class="check-field">
+                <input type="checkbox" id="splitEnabled" />
+                <span>多人均分</span>
+              </label>
+
+              <label class="field hidden" id="splitCountField">
+                <span>人數</span>
+                <input type="number" id="splitCount" min="1" step="1" value="2" />
+              </label>
+
+              <label class="field">
+                <span>編號</span>
+                <input type="text" id="invoiceNumber" placeholder="例如：INV-001" />
+              </label>
+
+              <label class="field">
+                <span>日期</span>
+                <input type="date" id="invoiceDate" />
+              </label>
+
+              <label class="field">
+                <span>備註</span>
+                <textarea id="invoiceNote" rows="3" placeholder="輸入補充說明"></textarea>
+              </label>
+            </div>
+          </section>
+
+          <section class="block">
+            <h2>折扣分區</h2>
+            <div class="grid single-grid">
+              <div class="discount-zone-card">
+                <h3>折扣分區1</h3>
+                <div class="grid two-grid">
+                  <label class="field">
+                    <span>名稱</span>
+                    <input type="text" id="zone1Name" placeholder="例如：9折、活動" />
+                  </label>
+                  <label class="field">
+                    <span>折數</span>
+                    <input type="number" id="zone1Rate" min="0" step="0.01" placeholder="例如：0.9" />
+                  </label>
+                </div>
+              </div>
+
+              <div class="discount-zone-card">
+                <h3>折扣分區2</h3>
+                <div class="grid two-grid">
+                  <label class="field">
+                    <span>名稱</span>
+                    <input type="text" id="zone2Name" placeholder="例如：8折、會員" />
+                  </label>
+                  <label class="field">
+                    <span>折數</span>
+                    <input type="number" id="zone2Rate" min="0" step="0.01" placeholder="例如：0.8" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="block">
+            <div class="items-header">
+              <h2>新增明細</h2>
+              <button type="button" id="add-item-btn" class="primary-btn">新增</button>
+            </div>
+
+            <div class="grid single-grid">
+              <label class="field">
+                <span>項目名稱</span>
+                <input type="text" id="draftItemName" placeholder="例如：網站設計費" />
+              </label>
+
+              <label class="field">
+                <span>金額</span>
+                <input type="number" id="draftItemAmount" min="0" step="0.01" placeholder="0" />
+              </label>
+
+              <label class="field">
+                <span>折扣分區</span>
+                <select id="draftItemGroup">
+                  <option value="NONE">無</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>單筆備註</span>
+                <textarea id="draftItemNote" rows="3" placeholder="輸入此項目的補充說明"></textarea>
+              </label>
+            </div>
+          </section>
+        </form>
+      </section>
+
+      <aside class="panel preview-panel">
+        <header class="section-header preview-header">
+          <div>
+            <p class="eyebrow">Live Preview</p>
+            <h2>結果區</h2>
+          </div>
+        </header>
+
+        <section class="action-bar">
+          <button type="button" id="copy-text-btn" class="secondary-btn">複製文字</button>
+          <button type="button" id="download-image-btn" class="secondary-btn">圖片預覽</button>
+          <button type="button" id="share-btn" class="secondary-btn">分享</button>
+        </section>
+        <p id="action-feedback" class="action-feedback" aria-live="polite"></p>
+
+        <article class="preview-card" id="preview-card">
+          <div class="preview-top">
+            <div>
+              <p class="card-label">名稱</p>
+              <h3 id="preview-client">未填寫</h3>
+            </div>
+            <div class="meta-pair">
+              <div>
+                <p class="card-label">編號</p>
+                <p id="preview-number">—</p>
+              </div>
+              <div>
+                <p class="card-label">日期</p>
+                <p id="preview-date">—</p>
+              </div>
+            </div>
+          </div>
+
+          <section class="preview-section">
+            <div class="preview-section-head">
+              <span>已新增明細</span>
+              <span id="preview-item-count">0 筆</span>
+            </div>
+            <div id="preview-items" class="preview-items empty">尚未新增明細</div>
+          </section>
+
+          <section class="preview-section totals-section" id="totals-section"></section>
+
+          <section class="preview-section note-section">
+            <p class="card-label">備註</p>
+            <p id="preview-note" class="note-text">尚無備註</p>
+          </section>
+        </article>
+      </aside>
+    </main>
+
+    <section class="capture-stage" aria-hidden="true">
+      <article class="share-card" id="share-card">
+        <div class="share-card-header">
+          <div>
+            <p class="card-label">名稱</p>
+            <h3 id="share-client">未填寫</h3>
+          </div>
+          <p id="share-date" class="share-date">—</p>
+        </div>
+
+        <section class="share-section">
+          <div class="share-section-head">
+            <span>明細摘要</span>
+            <span id="share-item-count">0 筆</span>
+          </div>
+          <div id="share-items" class="share-items"></div>
+          <p id="share-more" class="share-more hidden"></p>
+        </section>
+
+        <section class="share-section" id="share-totals"></section>
+
+        <section class="share-section">
+          <p class="card-label">備註</p>
+          <p id="share-note" class="note-text">尚無備註</p>
+        </section>
+      </article>
+    </section>
+
+    <section class="image-modal hidden" id="image-modal" aria-hidden="true">
+      <div class="image-modal-backdrop" id="image-modal-backdrop"></div>
+      <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
+        <div class="image-modal-header">
+          <h3 id="image-modal-title">圖片預覽</h3>
+          <button type="button" class="icon-btn" id="close-image-modal" aria-label="關閉">✕</button>
+        </div>
+        <div class="image-modal-body">
+          <img id="preview-image" class="preview-image" alt="請款明細預覽圖片" />
+          <p class="image-modal-hint">長按圖片可儲存或分享</p>
+          <div class="image-modal-actions">
+            <button type="button" id="modal-download-btn" class="secondary-btn">下載圖片</button>
+            <button type="button" id="modal-share-btn" class="secondary-btn">分享</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

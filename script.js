@@ -4,7 +4,8 @@ const MAX_ZONES = 5;
 const translations = {
   'zh-Hant': {
     locale: 'zh-TW',
-    documentTitle: '請款明細產生器',
+    documentTitle: '免費線上分帳工具｜免下載快速算帳・請款單產生',
+    metaDescription: '免費線上分帳工具，免下載即可快速算帳、多人分帳與請款單產生，支援一鍵分享與圖片輸出。',
     brand: 'QuickBillNow',
     appTitle: '請款明細產生器',
     previewEyebrow: '即時預覽',
@@ -16,7 +17,7 @@ const translations = {
     labelName: '名稱',
     labelSplitEnabled: '多人均分',
     labelSplitCount: '人數',
-    labelUseDiscount: '使用折扣',
+    labelUseDiscount: '啟用折扣（可選）',
     labelNumber: '編號',
     labelDate: '日期',
     labelNote: '備註',
@@ -36,6 +37,9 @@ const translations = {
     imagePreviewTitle: '圖片預覽',
     imagePreviewHint: '長按圖片可儲存或分享',
     disclaimer: '本工具僅供整理與分享明細，實際請款內容請自行確認。',
+    seoHeading: '免費線上分帳工具',
+    seoText: '這是一個免費線上分帳工具，不需要下載任何App，即可快速進行多人分帳、算帳與請款單產生。適合聚餐、旅遊、團購等情境使用。',
+    seoKeywords: '線上算帳、分帳工具、請款單產生器，免下載即可使用。',
     placeholderClientName: '例如：某某有限公司',
     placeholderInvoiceNumber: '例如：INV-001',
     placeholderInvoiceNote: '輸入補充說明',
@@ -76,7 +80,8 @@ const translations = {
   },
   en: {
     locale: 'en-US',
-    documentTitle: 'Billing Summary Generator',
+    documentTitle: 'Free Bill Split Tool | QuickBillNow',
+    metaDescription: 'Free online bill split tool. No download needed. Quickly calculate and share billing summaries.',
     brand: 'QuickBillNow',
     appTitle: 'Billing Summary Generator',
     previewEyebrow: 'Live Preview',
@@ -88,7 +93,7 @@ const translations = {
     labelName: 'Name',
     labelSplitEnabled: 'Split bill',
     labelSplitCount: 'People',
-    labelUseDiscount: 'Use discount',
+    labelUseDiscount: 'Enable discount (optional)',
     labelNumber: 'Number',
     labelDate: 'Date',
     labelNote: 'Note',
@@ -108,6 +113,9 @@ const translations = {
     imagePreviewTitle: 'Image Preview',
     imagePreviewHint: 'Long press the image to save or share it',
     disclaimer: 'This tool is for organizing and sharing billing details only. Please verify the final billing content yourself.',
+    seoHeading: 'Free Online Bill Split Tool',
+    seoText: 'This is a free online bill split tool that allows you to quickly calculate shared expenses. No app download required. Generate and share billing summaries instantly.',
+    seoKeywords: 'Online bill calculator, bill split tool, invoice generator. No download required.',
     placeholderClientName: 'e.g. Example Co., Ltd.',
     placeholderInvoiceNumber: 'e.g. INV-001',
     placeholderInvoiceNote: 'Add extra notes',
@@ -332,6 +340,9 @@ function getZoneMap() {
 function applyStaticTranslations() {
   document.documentElement.lang = currentLanguage;
   document.title = t('documentTitle');
+
+  const metaDescription = document.getElementById('meta-description');
+  if (metaDescription) metaDescription.setAttribute('content', t('metaDescription'));
 
   document.querySelectorAll('[data-i18n]').forEach((node) => {
     node.textContent = t(node.dataset.i18n);

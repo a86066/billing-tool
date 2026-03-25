@@ -24,6 +24,34 @@ body {
   color: var(--text);
 }
 
+.seo-section {
+  width: min(100%, 1100px);
+  margin: 0 auto 32px;
+  padding: 0 16px;
+}
+
+.seo-inner {
+  background: transparent;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+
+.seo-inner h2 {
+  margin: 0 0 10px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.seo-inner p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.seo-keywords {
+  margin-top: 8px;
+}
+
 button,
 input,
 textarea,

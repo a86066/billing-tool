@@ -251,16 +251,23 @@ function ensureDiscountZones(forceReset = false) {
   }
 }
 
-function formatCurrency(value) {
-  const formatter = new Intl.NumberFormat(translations[currentLanguage].locale, {
-    style: 'currency',
-    currency: 'TWD',
+function formatCurrency(value, lang = currentLanguage) {
+  const amount = Number(value) || 0;
+
+  if (lang === 'en') {
+    return `$${new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)}`;
+  }
+
+  return `NT$${new Intl.NumberFormat('zh-TW', {
+    minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  });
-  return formatter.format(Number(value) || 0);
+  }).format(amount)}`;
 }
 
-function formatNumber(value) {
+function formatRate(value) {
   const num = Number(value) || 0;
   if (Number.isInteger(num)) return String(num);
   return num.toFixed(2).replace(/\.00$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
@@ -280,8 +287,18 @@ function parseRate(value) {
   return num;
 }
 
-function formatDate(value) {
-  return value || '—';
+function formatDateByLanguage(value, lang = currentLanguage) {
+  if (!value) return '—';
+  if (lang !== 'en') return value;
+
+  const parsedDate = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) return value;
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(parsedDate);
 }
 
 function showFeedback(message) {
@@ -479,7 +496,7 @@ function getCurrentState() {
   return {
     name: fieldRefs.clientName?.value.trim() || t('unfilled'),
     number: fieldRefs.invoiceNumber?.value.trim() || '—',
-    date: formatDate(fieldRefs.invoiceDate?.value || ''),
+    date: formatDateByLanguage(fieldRefs.invoiceDate?.value || ''),
     note: fieldRefs.invoiceNote?.value.trim() || t('noNote'),
     items: detailedItems,
     totals,
@@ -487,8 +504,8 @@ function getCurrentState() {
 }
 
 function getAmountDisplay(item) {
-  if (!item.hasDiscount) return formatNumber(item.originalAmount);
-  return `${formatNumber(item.originalAmount)} × ${formatNumber(item.rate)} = ${formatNumber(item.discountedAmount)}`;
+  if (!item.hasDiscount) return formatCurrency(item.originalAmount);
+  return `${formatCurrency(item.originalAmount)} × ${formatRate(item.rate)} = ${formatCurrency(item.discountedAmount)}`;
 }
 
 function getItemLineDisplay(item) {
@@ -572,7 +589,7 @@ function renderTotals(totals) {
 function renderMeta() {
   if (previewRefs.client) previewRefs.client.textContent = fieldRefs.clientName?.value.trim() || t('unfilled');
   if (previewRefs.number) previewRefs.number.textContent = fieldRefs.invoiceNumber?.value.trim() || '—';
-  if (previewRefs.date) previewRefs.date.textContent = formatDate(fieldRefs.invoiceDate?.value || '');
+  if (previewRefs.date) previewRefs.date.textContent = formatDateByLanguage(fieldRefs.invoiceDate?.value || '');
   if (previewRefs.note) previewRefs.note.textContent = fieldRefs.invoiceNote?.value.trim() || t('noNote');
 }
 
@@ -584,14 +601,14 @@ function updateSplitUI() {
   }
 }
 
-function updateDiscountUI() {
+function updateDiscountUI({ renderZones = true } = {}) {
   const enabled = isDiscountEnabled();
   if (discountSection) discountSection.classList.toggle('hidden', !enabled);
   if (draftItemGroupField) draftItemGroupField.classList.toggle('hidden', !enabled);
 
   if (enabled) ensureDiscountZones();
   normalizeItemGroups();
-  renderDiscountZones();
+  if (renderZones) renderDiscountZones();
   refreshGroupOptions();
 }
 
@@ -625,13 +642,13 @@ function renderShareCard() {
   }
 }
 
-function updateView() {
+function updateView({ renderDiscountZones: shouldRenderDiscountZones = true } = {}) {
   if (fieldRefs.splitCount) {
     fieldRefs.splitCount.value = clampSplitCount(fieldRefs.splitCount.value);
   }
 
   updateSplitUI();
-  updateDiscountUI();
+  updateDiscountUI({ renderZones: shouldRenderDiscountZones });
   renderMeta();
   renderPreviewItems();
   renderTotals(calculateTotals(getCurrentItemsDetailed()));
@@ -690,7 +707,6 @@ function buildShareText() {
   if (state.totals.splitEnabled) lines.push(t('shareTextPerPerson', { value: formatCurrency(state.totals.perPersonAmount) }));
   lines.push('');
   lines.push(t('shareTextNote', { value: state.note }));
-  lines.push(t('disclaimer'));
 
   return lines.join('\n');
 }
@@ -833,7 +849,7 @@ if (discountZonesContainer) {
     }
 
     if (event.target.classList.contains('zone-rate-input') || event.target.classList.contains('zone-name-input')) {
-      updateView();
+      updateView({ renderDiscountZones: false });
     }
   });
 
@@ -918,8 +934,19 @@ document.addEventListener('keydown', (event) => {
 });
 
 if (form) {
-  form.addEventListener('input', updateView);
-  form.addEventListener('change', updateView);
+  form.addEventListener('input', (event) => {
+    const isDiscountZoneInput = event.target.closest('#discount-zones') &&
+      (event.target.classList.contains('zone-name-input') || event.target.classList.contains('zone-rate-input'));
+
+    updateView({ renderDiscountZones: !isDiscountZoneInput });
+  });
+
+  form.addEventListener('change', (event) => {
+    const isDiscountZoneInput = event.target.closest('#discount-zones') &&
+      (event.target.classList.contains('zone-name-input') || event.target.classList.contains('zone-rate-input'));
+
+    updateView({ renderDiscountZones: !isDiscountZoneInput });
+  });
 }
 
 if (previewItems) {

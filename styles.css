@@ -403,8 +403,12 @@ select:focus {
   font-size: 0.92rem;
 }
 
-.share-disclaimer {
-  margin-top: 4px;
+.share-brand {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  letter-spacing: 0.04em;
 }
 
 .image-modal {

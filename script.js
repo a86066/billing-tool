@@ -604,12 +604,14 @@ function renderMeta() {
   if (previewRefs.note) previewRefs.note.textContent = fieldRefs.invoiceNote?.value.trim() || t('noNote');
 }
 
+function normalizeSplitCountInput() {
+  if (!fieldRefs.splitCount) return;
+  fieldRefs.splitCount.value = String(clampSplitCount(fieldRefs.splitCount.value || 1));
+}
+
 function updateSplitUI() {
   const enabled = Boolean(fieldRefs.splitEnabled?.checked);
   if (splitCountField) splitCountField.classList.toggle('hidden', !enabled);
-  if (enabled && fieldRefs.splitCount) {
-    fieldRefs.splitCount.value = clampSplitCount(fieldRefs.splitCount.value);
-  }
 }
 
 function updateDiscountUI({ renderZones = true } = {}) {
@@ -654,10 +656,6 @@ function renderShareCard() {
 }
 
 function updateView({ renderDiscountZones: shouldRenderDiscountZones = true } = {}) {
-  if (fieldRefs.splitCount) {
-    fieldRefs.splitCount.value = clampSplitCount(fieldRefs.splitCount.value);
-  }
-
   updateSplitUI();
   updateDiscountUI({ renderZones: shouldRenderDiscountZones });
   renderMeta();
@@ -953,10 +951,21 @@ if (form) {
   });
 
   form.addEventListener('change', (event) => {
+    if (event.target === fieldRefs.splitCount) {
+      normalizeSplitCountInput();
+    }
+
     const isDiscountZoneInput = event.target.closest('#discount-zones') &&
       (event.target.classList.contains('zone-name-input') || event.target.classList.contains('zone-rate-input'));
 
     updateView({ renderDiscountZones: !isDiscountZoneInput });
+  });
+}
+
+if (fieldRefs.splitCount) {
+  fieldRefs.splitCount.addEventListener('blur', () => {
+    normalizeSplitCountInput();
+    updateView();
   });
 }
 

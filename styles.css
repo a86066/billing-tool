@@ -35,6 +35,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .app {
   width: min(100%, 1100px);
   margin: 0 auto;
@@ -58,6 +63,10 @@ button {
   margin-bottom: 18px;
 }
 
+.app-header {
+  align-items: center;
+}
+
 .section-header h1,
 .section-header h2,
 .block h2,
@@ -72,12 +81,37 @@ button {
   color: var(--primary);
   font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-.section-note {
+.section-hint {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.lang-switch {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+}
+
+.lang-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.lang-btn.active {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .form-layout,
@@ -167,11 +201,21 @@ select:focus {
 }
 
 .items-header,
-.action-bar {
+.action-bar,
+.discount-zone-header,
+.compact-item-row,
+.total-row,
+.share-card-header,
+.share-section-head,
+.image-modal-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.inline-header {
+  align-items: flex-start;
 }
 
 .primary-btn,
@@ -234,8 +278,7 @@ select:focus {
   padding: 18px;
 }
 
-.preview-top,
-.share-card-header {
+.preview-top {
   display: grid;
   gap: 14px;
 }
@@ -258,50 +301,40 @@ select:focus {
 }
 
 .meta-pair p,
-.share-date,
-.share-more {
+.share-date {
   margin: 0;
 }
 
-.preview-section-head,
-.total-row,
-.preview-item-top,
-.preview-item-meta,
-.share-section-head,
-.share-item-row,
-.share-item-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+.compact-list {
+  gap: 8px;
 }
 
-.preview-item,
-.share-item {
+.compact-item-row,
+.share-line-item {
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 12px;
-  display: grid;
-  gap: 8px;
+  border-radius: 12px;
+  padding: 10px 12px;
   background: #fff;
 }
 
-.preview-item-name,
-.share-item-name {
-  font-weight: 700;
+.compact-item-main,
+.share-line-item {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
 }
 
-.preview-item-note,
-.share-item-note {
-  margin: 0;
+.compact-item-name,
+.share-line-name {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.compact-item-text,
+.share-line-text {
   color: var(--muted);
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
-.preview-item-group,
-.share-item-group {
-  color: var(--primary);
-  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .empty {
@@ -310,10 +343,6 @@ select:focus {
   border-radius: 14px;
   color: var(--muted);
   text-align: center;
-}
-
-.muted-row {
-  color: var(--muted);
 }
 
 .grand-total-row,
@@ -332,6 +361,13 @@ select:focus {
   line-height: 1.6;
 }
 
+.disclaimer {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 .capture-stage {
   position: fixed;
   left: -99999px;
@@ -348,10 +384,27 @@ select:focus {
   box-shadow: none;
 }
 
-.share-date,
-.share-more {
+.share-card-simple {
+  border-radius: 20px;
+  padding: 16px;
+  gap: 12px;
+}
+
+.share-items {
+  gap: 8px;
+}
+
+.share-line-item {
+  padding: 8px 10px;
+}
+
+.share-date {
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.share-disclaimer {
+  margin-top: 4px;
 }
 
 .image-modal {
@@ -418,11 +471,6 @@ select:focus {
   font-size: 0.92rem;
 }
 
-.image-modal-actions {
-  display: flex;
-  gap: 12px;
-}
-
 .hidden {
   display: none;
 }
@@ -451,18 +499,25 @@ select:focus {
 
   .section-header,
   .items-header,
-  .preview-section-head,
+  .discount-zone-header,
+  .compact-item-row,
   .total-row,
-  .preview-item-top,
-  .preview-item-meta,
   .share-section-head,
-  .share-item-row,
-  .share-item-meta,
   .share-card-header,
   .action-bar,
-  .image-modal-actions {
+  .image-modal-actions,
+  .app-header {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .lang-switch {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .lang-btn {
+    flex: 1;
   }
 
   .two-grid,
